@@ -6,16 +6,18 @@ from dotenv import load_dotenv, find_dotenv
 import os
 
 _ = load_dotenv(find_dotenv())
-
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 
 class LangchainClient():
 
+    def __init__(self) -> None:
+        self.client = OpenAI(api_key=OPENAI_API_KEY)
+
     def transcribe_video(self, audio_path: str) -> str:
         try:
             audio_blob = Blob(path=audio_path)
-            parser = OpenAIWhisperParser(api_key=OPENAI_API_KEY)
+            parser = OpenAIWhisperParser()
             transcription = parser.parse(audio_blob)
             return transcription[0].page_content
 
