@@ -23,4 +23,4 @@ class VideosService:
             raise HTTPException(status_code=500, detail=e.args[0])
 
         finally:
-            self.videoRepository(audio_path)
+            self.videoRepository.delete_audio(audio_path)
