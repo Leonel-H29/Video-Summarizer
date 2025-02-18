@@ -1,4 +1,9 @@
 export interface TranscriptButtonProps {
   videoFile?: File | null;
-  onTranscriptReceived: (data: { summary: string }) => void;
+  language: string;
+  onTranscriptReceived: (data: {
+    transcription: string;
+    summary: string;
+  }) => void;
+  setLoading: (loading: boolean) => void;
 }
