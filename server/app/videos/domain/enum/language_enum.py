@@ -2,6 +2,8 @@ from enum import Enum
 
 
 class LanguageEnum(Enum):
+    ARABIC_EG = "Arabic (Egypt)"
+    ARABIC_MA = "Arabic (Morocco)"
     CHINESE_CN = "Chinese (China)"
     SPANISH_AR = "Spanish (Argentina)"
     SPANISH_ES = "Spanish (Spain)"
