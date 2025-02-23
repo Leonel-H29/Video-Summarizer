@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LanguageEnum } from '../enum/language.enum';
+import { LanguageEnum } from '@/app/enum/language.enum';
 import {
   Command,
   CommandInput,

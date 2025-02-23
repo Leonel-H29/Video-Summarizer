@@ -1,10 +1,10 @@
 'use client';
 import { useState } from 'react';
-import { VideoUploader } from '../components/VideoUploader';
-import { TranscriptButton } from '../components/TranscriptionButton';
-import { SummaryDisplay } from '../components/SummaryDisplay';
-import { GeneratePDFButton } from '../components/GeneratePDFButton';
-import { LanguageSelector } from '../components/LanguageSelector';
+import { VideoUploader } from '@/app/components/VideoUploader';
+import { TranscriptButton } from '@/app/components/TranscriptionButton';
+import { SummaryDisplay } from '@/app/components/SummaryDisplay';
+import { GeneratePDFButton } from '@/app/components/GeneratePDFButton';
+import { LanguageSelector } from '@/app/components/LanguageSelector';
 import {
   Card,
   CardContent,

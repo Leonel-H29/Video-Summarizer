@@ -10,12 +10,11 @@ services:
       - ./server/.env
     ports:
       - '8082:8082'
-    volumes:
-      - /media:/media
-      - /mnt:/mnt
     depends_on:
       - n8n
     restart: unless-stopped
+    networks:
+      - video-summarizer-network
 
   n8n:
     build:
@@ -38,6 +37,8 @@ services:
     depends_on:
       - postgres
     restart: unless-stopped
+    networks:
+      - video-summarizer-network
 
   postgres:
     image: postgres:13
@@ -51,6 +52,8 @@ services:
     restart: unless-stopped
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    networks:
+      - video-summarizer-network
 
   client:
     build:
@@ -64,12 +67,20 @@ services:
     restart: unless-stopped
     depends_on:
       - server
+    networks:
+      - video-summarizer-network
 
   gotenberg:
     image: gotenberg/gotenberg:8
     container_name: gotenberg
     ports:
       - '3500:3000'
+    networks:
+      - video-summarizer-network
 
 volumes:
   postgres-data:
+
+networks:
+  video-summarizer-network:
+    driver: bridge
