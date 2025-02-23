@@ -1,0 +1,6 @@
+node_modules/
+src/app/api
+.next/
+package-lock.json
+README.md
+.gitignore
