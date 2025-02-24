@@ -41,6 +41,11 @@ Below is the detailed documentation for the video summarizer project, complement
 
 - **`/transcript`**: On this route, users can upload videos for processing, then the user can view the summary and transcription of the uploaded video. It also offers the option to download the summary in PDF format.
 
+![Captura desde 2025-02-24 09-31-35](https://github.com/user-attachments/assets/4e3d9f0e-ea18-4e7e-a196-7aa6a92bc4a4)
+![Captura desde 2025-02-24 09-31-53](https://github.com/user-attachments/assets/74a89295-2350-4815-a45e-3b5e28294c27)
+![Captura desde 2025-02-24 09-31-42](https://github.com/user-attachments/assets/81e785f5-86d5-414f-9b63-8f3209a7a783)
+
+
 #### Functions of the Page
 
 1. **Video Upload**: Users upload a video from their local device. This is handled in the `VideoUploader` component.
