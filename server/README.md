@@ -7,7 +7,7 @@ To get the project up and running on your local machine, follow these steps:
 1. Clone the repository to your local machine.
 2. Install the required dependencies by running `pip install -r requirements.txt`.
 3. Set up the environment variables by copying the `.env.example` file to a new file named `.env` and filling in the necessary values.
-4. Start the server with the command `uvicorn app.main:app --reload`.
+4. Start the server with the command `python manage.py` or `python3 manage.py`. By default, the server will run on port 8082. To access the application, navigate to `http://localhost:8082` in your web browser.
 
 ## Main Endpoint
 
@@ -72,7 +72,39 @@ The main endpoint of the API is used to generate a summary of the video content 
 
 ## N8N Workflow Integration
 
-The project integrates with an N8N workflow to generate summaries of transcriptions. This is handled by the `WorkflowClient` class (`startLine: 12`, `endLine: 40`). It sends a POST request to the N8N workflow URL with the transcription and language as JSON payload and expects a summary in response.
+The project integrates with an N8N workflow to generate summaries of transcriptions. This is handled by the `WorkflowClient` class. It sends a POST request to the N8N workflow URL with the transcription and language as JSON payload and expects a summary in response.
+
+```12:40:server/app/clients/n8n/workflow_client.py
+class WorkflowClient:
+    def __init__(self):
+        self.__workflow_url = os.getenv('N8N_WORKFLOW_URL')
+
+    def summary(self, transcription_path: str, language: LanguageEnum):
+        try:
+            with open(transcription_path, 'r') as file:
+                transcription = file.read()
+
+            response = requests.post(
+                self.__workflow_url,
+                json={
+                    'transcription': transcription,
+                    'language': language.value
+                }
+            )
+
+            if response.status_code != 200:
+                raise HTTPException(
+                    status_code=response.status_code,
+                    detail=str(e)
+                )
+            return {
+                'transcription': transcription,
+                'summary': response.text
+            }
+
+        except requests.exceptions.RequestException as e:
+            raise HTTPException(status_code=500, detail=str(e))
+```
 
 ## Environment Variables
 
@@ -87,7 +119,7 @@ An example `.env` file would look like this:
 
 To access the Swagger UI documentation for the API, follow these steps after starting the server:
 
-1. Navigate to `http://localhost:8000/docs` in your web browser.
+1. Navigate to `http://localhost:8082/docs` in your web browser.
 2. You will be presented with an interactive UI where you can test out the different API endpoints.
 3. Each endpoint can be expanded to view its documentation, which includes the expected parameters, request body, and response format.
 4. You can also execute requests directly from this interface by filling in the required fields and clicking the "Try it out" button.
