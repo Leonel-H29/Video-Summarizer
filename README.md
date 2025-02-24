@@ -45,13 +45,14 @@ The primary goal of this project is to showcase how no-code platforms like N8N c
 
 **SCHEMA**
 
-![alt text](image.png)
+![image](https://github.com/user-attachments/assets/192299e2-2f9c-4c3a-9bbb-e8894d5c456c)
+
 
 ### N8N Workflows
 
 ### Video Local Summary Workflow
 
-![Video Local Summary Workflow](attachment://Captura%20desde%202025-02-24%2008-11-08.png)
+![Captura desde 2025-02-24 08-11-24](https://github.com/user-attachments/assets/ea453145-ea4d-46a8-b1f2-7b06e16daadb)
 
 This workflow is designed to handle the summarization of video transcriptions. Here's a step-by-step breakdown of the process:
 
@@ -66,7 +67,8 @@ This workflow is designed to handle the summarization of video transcriptions. H
 
 ### PDF Generation Workflow
 
-![PDF Generation Workflow](attachment://Captura%20desde%202025-02-24%2008-11-24.png)
+![Captura desde 2025-02-24 08-11-08](https://github.com/user-attachments/assets/cb0ed9be-60c6-4e76-9234-b4a5b34c282b)
+
 
 This workflow manages the generation of a PDF from the summarized text. The steps include:
 
