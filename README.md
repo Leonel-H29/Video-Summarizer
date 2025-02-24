@@ -26,8 +26,8 @@ The primary goal of this project is to showcase how no-code platforms like N8N c
 
 1. **Video Upload:**
 
-   - Users navigate to the `/transcript/local_video` page and upload a video from their local system.
-   - The video is sent to the server via an HTTP POST request to `/api/transcript/local_video`.
+   - Users navigate to the `/transcript/` page and upload a video from their local system.
+   - The video is sent to the server via an HTTP POST request to `/api/transcript/`.
 
 2. **Video Processing:**
 
@@ -43,6 +43,48 @@ The primary goal of this project is to showcase how no-code platforms like N8N c
    - The summary is converted into a PDF document.
    - The PDF file is then made available for the user to download, completing the cycle from upload to summary retrieval.
 
+**SCHEMA**
+
+![alt text](image.png)
+
+### N8N Workflows
+
+### Video Local Summary Workflow
+
+![Video Local Summary Workflow](attachment://Captura%20desde%202025-02-24%2008-11-08.png)
+
+This workflow is designed to handle the summarization of video transcriptions. Here's a step-by-step breakdown of the process:
+
+1. **Webhook**: The workflow is triggered by a webhook that receives the transcription data.
+2. **Edit Fields**: This node processes the incoming data to ensure it is in the correct format or extracts necessary fields.
+3. **Conditional (If node)**: This node checks if the transcription data is valid.
+   - If the transcription is valid, the workflow proceeds to generate a summary.
+   - If not, it moves to the "Return a Error Message" node.
+4. **OpenAI Message Model**: This node uses the OpenAI API to generate a summary from the transcription.
+5. **Wait**: This node introduces a delay to ensure that the summary generation process has completed.
+6. **Respond to Webhook**: Finally, the summary is sent back to the original caller through the webhook response.
+
+### PDF Generation Workflow
+
+![PDF Generation Workflow](attachment://Captura%20desde%202025-02-24%2008-11-24.png)
+
+This workflow manages the generation of a PDF from the summarized text. The steps include:
+
+1. **Webhook**: Triggered when a request to generate a PDF is received.
+2. **Save to Directory**: This node saves the summary text as a PDF file in a specified directory.
+3. **Check File Creation**: After attempting to save the file, this node checks if the PDF was successfully created.
+   - If the file exists, it proceeds to send a success message.
+   - If the file does not exist, it sends an error message indicating the failure.
+
+### Setting Up and Running the Workflows
+
+To set up and run these workflows:
+
+1. Ensure that N8N is installed and running.
+2. Import the workflow configurations into your N8N environment.
+3. Configure the webhook URLs in your server application to match those expected by the N8N workflows.
+4. Test the workflows by sending requests from your server application to verify that they execute as expected and handle all cases (success and error scenarios).
+
 ## Installation and Setup
 
 ### Prerequisites
@@ -53,30 +95,24 @@ The primary goal of this project is to showcase how no-code platforms like N8N c
 
 ### Steps to Run the Project Locally
 
-1. **Clone the Repository:**
+1. **Using Docker Compose:**
+
+   To start all services (server, client, N8N, and other dependencies), navigate to the root directory of the project and run:
 
    ```bash
-   git clone https://github.com/your-repository-url.git
-   cd video-summarizer
+   docker-compose up
    ```
 
-2. **Set Up the Backend:**
+   This command will build and start all the containers defined in the `docker-compose.yml` file.
 
-   ```bash
-   cd server
-   docker build -t video-summarizer-backend .
-   docker run -p 8000:8000 video-summarizer-backend
-   ```
+2. **Individual Project Setup:**
 
-3. **Set Up the Frontend:**
+   For detailed instructions on setting up the server or client individually, please refer to their respective README files:
 
-   ```bash
-   cd ../client
-   npm install
-   npm run dev
-   ```
+   - [Server README](server/README.md)
+   - [Client README](client/README.md)
 
-4. **Access the Application:**
+3. **Access the Application:**
    - Open `http://localhost:3000` in your web browser to view the application.
 
 ## Conclusion
