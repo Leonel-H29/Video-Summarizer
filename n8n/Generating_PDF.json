@@ -1,0 +1,280 @@
+{
+  "name": "Generating PDF",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-pdf",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-220, -20],
+      "id": "75ff0d3c-1936-4970-9654-c34a95c0c3a9",
+      "name": "Webhook",
+      "webhookId": "aa9dfabe-cd1c-4282-811a-8bc56556112d"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "867d7063-0c9a-4c5e-9903-02904ac96619",
+              "leftValue": "={{ $json.stdout }}",
+              "rightValue": "0",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1440, -20],
+      "id": "981ecc50-303f-461f-b416-85819cc23202",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"message\": \"Error generating PDF file\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1840, -120],
+      "id": "6f1dd6f9-8362-4b37-aade-4c9b7ba30251",
+      "name": "Respond Error Message"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"message\": \"The PDF file has been generated succesfully\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1840, 180],
+      "id": "9d88fae1-a4e9-4a80-af0c-57fbd953f5b4",
+      "name": "Respond Succesful Message"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/media/{{ $binary.data.fileName }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [960, -20],
+      "id": "88e7eaa1-6ef5-490f-83ac-68b134f9c639",
+      "name": "Save PDF file in my Disk",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://gotenberg:3000/forms/chromium/convert/html",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "files",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, -20],
+      "id": "8b7a7aec-89b1-49e8-8680-1fdf7faf5ca3",
+      "name": "HTTP POST Request to Gotenberg"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "html_base64",
+        "options": {
+          "fileName": "index.html",
+          "mimeType": "text/html"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [500, -20],
+      "id": "802bcdf9-56f8-4f77-aee6-4a691a896afe",
+      "name": "Convert to HTML File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8c3743cd-2395-4af2-929d-5d9bbb3c4683",
+              "name": "html_base64",
+              "value": "={{ $json.data.base64Encode() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [280, -20],
+      "id": "964a9efb-412b-41e5-aa4a-3ffeaeba386a",
+      "name": "Get Base64 Encode"
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.body.markdownContent }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [40, -20],
+      "id": "8b848540-63a5-4dcf-bb6c-cc49d94c1843",
+      "name": "Markdown to HTML"
+    },
+    {
+      "parameters": {
+        "command": "=[ -f \"{{ $json.fileName }}\" ] && echo 1 || echo 0\n"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1180, -20],
+      "id": "a683c674-b6a9-4119-8b99-735d0e196329",
+      "name": "Execute Command"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Markdown to HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Respond Error Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Succesful Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save PDF file in my Disk": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP POST Request to Gotenberg": {
+      "main": [
+        [
+          {
+            "node": "Save PDF file in my Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to HTML File": {
+      "main": [
+        [
+          {
+            "node": "HTTP POST Request to Gotenberg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Base64 Encode": {
+      "main": [
+        [
+          {
+            "node": "Convert to HTML File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown to HTML": {
+      "main": [
+        [
+          {
+            "node": "Get Base64 Encode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "45ba89f8-b90d-4256-ae14-d58336a83cb1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "625a67f2b5fa4472592f4fe8f40f113da50896c9009399124ada1f2e4cfadb73"
+  },
+  "id": "PyPivnlHMJ7Pb029",
+  "tags": []
+}

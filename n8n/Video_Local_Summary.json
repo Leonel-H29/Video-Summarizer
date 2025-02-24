@@ -1,0 +1,250 @@
+{
+  "name": "Video Local Summary",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=gpt-4o-2024-11-20",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an expert in summarizing videos. \nYour task is to provide a detailed summary of the video content in a structured and organized way. The summary should be clear, concise, and focused on the main content, excluding any unrelated advertisements.\n\nThe summary should include:\n\n1. **Introduction**: A brief overview of the video's purpose, main topics, and context. If the content is scientific (such as in fields like Medicine, Physics, or Mathematics), include the relevant scientific symbols or notations (e.g., equations, formulas, or variables).\n\n2. **Topics Covered**: Break down the video into main topics and subtopics. For each topic, provide:\n   - A brief explanation.\n   - Examples or key points discussed.\n   - In case of scientific content, ensure to represent all relevant symbols, formulas, and mathematical notations properly (e.g., Δx, E = mc², f(x) = ax² + bx + c).\n\n3. **Enumerated List**: For each topic, always provide an enumerated list of the key points or ideas, ensuring clarity, logical order, and accurate representation of concepts, including scientific symbols if applicable.\n\nMake sure to **ignore any advertisements** or promotional content that is not directly related to the main topic.\n\nThe summary should be written in {{ $('Edit Fields').item.json.language }}, but retain specific terms or phrases in the video's original language when relevant.\n\nHere is the transcript:\\n\\n\n\"\"\"\n{{ $('Edit Fields').item.json.transcription }}\n\"\"\"\nSummary: [Organized and detailed summary, structured as described above, ensuring scientific precision where necessary and excluding unrelated ads]\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        80,
+        460
+      ],
+      "id": "3809184d-8071-4864-8834-b99e8d978406",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "KvQmJIXEgmgVu2pa",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        360,
+        460
+      ],
+      "id": "76c6b264-2e45-4b31-b425-155943c077e2",
+      "name": "Wait",
+      "webhookId": "f559316f-fb14-4873-b8ee-d2897c64e6d0"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "video-summary",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -900,
+        140
+      ],
+      "id": "573c7f54-bec7-47eb-8214-29fe46239e90",
+      "name": "Webhook",
+      "webhookId": "f69f841b-f2bb-4bfa-9dc6-df106cee7831"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.message.content }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        600,
+        460
+      ],
+      "id": "24dd4cdf-bf4b-43dd-85aa-1cdd93cd0ff8",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"error\": \"There has been no text\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6e32b7ad-575f-4027-9eb3-d6e4e5710ed3",
+      "name": "Return a Error Message"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d1c17429-60a3-436e-bc7b-936bb532ae91",
+              "name": "transcription",
+              "value": "={{ $json.body.transcription }}",
+              "type": "string"
+            },
+            {
+              "id": "3a5915ca-0cc4-415d-85b4-665a60832785",
+              "name": "language",
+              "value": "={{ $json.body.language }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -600,
+        140
+      ],
+      "id": "058aff9f-9ce0-4241-a411-7f819fc628d5",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "db1c4f0e-2368-4c3e-a53a-7da88ac655c2",
+              "leftValue": "={{ $json.transcription }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "8dff10fc-f927-44b0-807e-1a6c99f432fc",
+              "leftValue": "={{ $json.transcription }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -300,
+        140
+      ],
+      "id": "eda3a2d0-f6cb-473b-b56b-2b9950b0e623",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Return a Error Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a7e5133b-9118-4157-8553-2ed80ea3fb57",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "625a67f2b5fa4472592f4fe8f40f113da50896c9009399124ada1f2e4cfadb73"
+  },
+  "id": "eZFnywYnW1VLdjxN",
+  "tags": []
+}

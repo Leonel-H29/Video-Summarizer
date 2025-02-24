@@ -1,0 +1,86 @@
+version: '3.7'
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: server
+    env_file:
+      - ./server/.env
+    ports:
+      - '8082:8082'
+    depends_on:
+      - n8n
+    restart: unless-stopped
+    networks:
+      - video-summarizer-network
+
+  n8n:
+    build:
+      context: ./n8n
+      dockerfile: Dockerfile
+    container_name: n8n
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=n8n_user
+      - DB_POSTGRESDB_PASSWORD=n8n_password
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+    ports:
+      - '5678:5678'
+    volumes:
+      - /media:/media
+      - /mnt:/mnt
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - video-summarizer-network
+
+  postgres:
+    image: postgres:13
+    container_name: postgres-n8n
+    environment:
+      - POSTGRES_DB=n8n
+      - POSTGRES_USER=n8n_user
+      - POSTGRES_PASSWORD=n8n_password
+    ports:
+      - '5430:5432'
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - video-summarizer-network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: client
+    env_file:
+      - ./client/.env
+    ports:
+      - '3000:3000'
+    restart: unless-stopped
+    depends_on:
+      - server
+    networks:
+      - video-summarizer-network
+
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    container_name: gotenberg
+    ports:
+      - '3500:3000'
+    networks:
+      - video-summarizer-network
+
+volumes:
+  postgres-data:
+
+networks:
+  video-summarizer-network:
+    driver: bridge
